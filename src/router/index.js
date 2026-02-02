@@ -19,11 +19,6 @@ const router = createRouter({
       component: () => import('../views/LoginView.vue')
     },
     {
-      path: '/:pathMatch(.*)*',
-      name: 'not-found',
-      component: () => import('../views/NotFoundView.vue')
-    },
-    {
       path: '/product/:id',
       name: 'product-detail',
       component: () => import('../views/ProductDetailView.vue')
@@ -32,6 +27,29 @@ const router = createRouter({
       path: '/propose',
       name: 'propose-perfume',
       component: () => import('../views/ProposePerfumeView.vue')
+    },
+    {
+      path: '/admin/moderators',
+      name: 'admin-moderators',
+      component: () => import('../views/ModeratorAdminView.vue'),
+      meta: { requiresAdmin: true }
+    },
+    {
+      path: '/admin/proposals',
+      name: 'admin-proposals',
+      component: () => import('../views/ProposalsAdminView.vue'),
+      meta: { requiresAdmin: true }
+    },
+    {
+      path: '/favorites',
+      name: 'favorites',
+      component: () => import('../views/WishlistView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/NotFoundView.vue')
     }
   ],
 })

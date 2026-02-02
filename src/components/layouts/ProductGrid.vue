@@ -94,6 +94,18 @@
       <!-- Product Grid -->
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <div v-for="product in displayedProducts" :key="product.id" class="group relative bg-[#1A1B24] border border-white/5 hover:border-luxury-gold/50 transition-all duration-300">
+          <!-- Favorite Button (Top Right) -->
+          <button 
+            v-if="authStore.isAuthenticated"
+            @click.prevent="toggleFavorite(product.id)"
+            class="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 hover:border-luxury-gold/50 transition-all duration-300"
+            :class="wishlistStore.isInWishlist(product.id) ? 'text-red-500' : 'text-white/60 hover:text-red-400'"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :fill="wishlistStore.isInWishlist(product.id) ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+
           <RouterLink :to="`/product/${product.id}`" class="block">
             <div class="aspect-[3/4] overflow-hidden relative bg-black/40">
                 <div v-if="product.tag" :class="['absolute top-4 z-10 text-deep-midnight text-xs font-bold px-2 py-1 uppercase tracking-wider', product.tagColor || 'bg-luxury-gold', product.tag === '-20%' ? 'right-4' : 'left-4']">
@@ -138,6 +150,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { searchProducts, getPopularTags } from '../../services/productService'
+import { useWishlistStore } from '@/stores/wishlistStore'
+import { useAuthStore } from '@/stores/authStore'
+import { useToastStore } from '@/stores/toastStore'
+
+const wishlistStore = useWishlistStore()
+const authStore = useAuthStore()
+const toastStore = useToastStore()
 
 const props = defineProps({
   title: {
@@ -195,7 +214,37 @@ const selectTag = (tag) => {
     handleLocalSearch()
 }
 
+async function toggleFavorite(productId) {
+   
+    try {
+        const result = await wishlistStore.toggleWishlist(productId)
+
+        if (result.action === 'added') {
+            toastStore.addToast({
+                message: 'Añadido a favoritos',
+                type: 'success'
+            })
+        } else {
+            toastStore.addToast({
+                message: 'Eliminado de favoritos',
+                type: 'info'
+            })
+        }
+    } catch (error) {
+
+        toastStore.addToast({
+            message: 'Error al actualizar favoritos',
+            type: 'error'
+        })
+    }
+}
+
 onMounted(async () => {
     popularTags.value = await getPopularTags()
+    
+    // Load wishlist if user is authenticated
+    if (authStore.isAuthenticated && !wishlistStore.isInitialized) {
+        wishlistStore.loadWishlist()
+    }
 })
 </script>

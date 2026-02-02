@@ -13,6 +13,9 @@ export const useAuthStore = defineStore('auth', () => {
     const isAuthenticated = computed(() => !!token.value && !!user.value)
     const userDisplayName = computed(() => user.value?.display_name ?? user.value?.name ?? '')
     const userPhoto = computed(() => user.value?.photo_url ?? user.value?.picture ?? '')
+    const isAdmin = computed(() => user.value?.is_admin === 1 || user.value?.is_admin === true)
+    const isModerator = computed(() => user.value?.is_moderator === 1 || user.value?.is_moderator === true)
+    const canAccessAdmin = computed(() => isAdmin.value || isModerator.value)
 
     // Actions
     async function loginWithGoogle(credential) {
@@ -53,6 +56,14 @@ export const useAuthStore = defineStore('auth', () => {
             token.value = saved.token
             user.value = saved.user
         }
+        console.log('Auth Debug:', {
+            user: user.value,
+            is_admin: user.value?.is_admin,
+            is_moderator: user.value?.is_moderator,
+            isAdmin: isAdmin.value,
+            isModerator: isModerator.value,
+            canAccessAdmin: canAccessAdmin.value
+        })
     }
 
     return {
@@ -65,9 +76,13 @@ export const useAuthStore = defineStore('auth', () => {
         isAuthenticated,
         userDisplayName,
         userPhoto,
+        isAdmin,
+        isModerator,
+        canAccessAdmin,
         // Actions
         loginWithGoogle,
         logout,
         initialize,
     }
 })
+

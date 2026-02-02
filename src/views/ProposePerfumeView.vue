@@ -2,12 +2,10 @@
   <div class="min-h-screen bg-deep-midnight text-white font-montserrat flex flex-col">
 
 
-    <main class="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
-      <div class="w-full ">
-        
-       
-
-        <div class="bg-[#1A1B24]/80 backdrop-blur-md rounded-3xl border border-white/5 shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+    <main class="flex-grow container mx-auto py-8">
+      <div class="w-full">
+    
+        <div class="bg-[#1A1B24]/80 backdrop-blur-md rounded-xl border border-white/5 shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
             
             <!-- Left Panel: Image Wrapper & Preview -->
             <div class="w-full md:w-2/5 relative bg-black/40 flex flex-col items-center justify-center p-8 border-b md:border-b-0 md:border-r border-white/5 group">
@@ -105,7 +103,7 @@
                             >
                                 <option value="" disabled selected class="text-gray-500">Selecciona un tipo</option>
                                 <option value="original">Original</option>
-                                <option value="inspiracion">Inspiración</option>
+                                <option value="inspiracion">Dupe</option>
                                 <option value="tester">Tester</option>
                                 <option value="decant">Decant</option>
                             </select>
@@ -131,26 +129,34 @@
                     <div class="grid grid-cols-2 gap-6">
                         <div class="space-y-2">
                              <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">ML</label>
-                             <input 
+                             <select
                                 v-bind="mlAttrs"
                                 v-model.number="ml"
-                                type="number" 
-                                class="w-full bg-deep-midnight/50 border-b border-white/10 px-4 py-3 text-white focus:outline-none focus:border-luxury-gold transition-colors" 
+                                class="w-full bg-deep-midnight/50 border-b border-white/10 px-4 py-3 text-white focus:outline-none focus:border-luxury-gold appearance-none cursor-pointer"
                                 :class="{ 'border-red-500': errors.ml }"
-                                placeholder="100"
                             >
+                                <option value="" disabled class="text-gray-500">Selecciona ML</option>
+                                <option :value="25">25 ml</option>
+                                <option :value="50">50 ml</option>
+                                <option :value="100">100 ml</option>
+                                <option :value="200">200 ml</option>
+                            </select>
                             <span v-if="errors.ml" class="text-xs text-red-400 block">{{ errors.ml }}</span>
                         </div>
                         <div class="space-y-2">
                              <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Concentración</label>
-                             <input 
+                             <select 
                                 v-bind="concentracionAttrs"
                                 v-model="concentracion"
-                                type="text" 
-                                class="w-full bg-deep-midnight/50 border-b border-white/10 px-4 py-3 text-white focus:outline-none focus:border-luxury-gold transition-colors" 
+                                class="w-full bg-deep-midnight/50 border-b border-white/10 px-4 py-3 text-white focus:outline-none focus:border-luxury-gold appearance-none cursor-pointer"
                                 :class="{ 'border-red-500': errors.concentracion }"
-                                placeholder="Ej. Parfum"
                             >
+                                <option value="" disabled selected class="text-gray-500">Selecciona concentración</option>
+                                <option value="Eau de Toilette">Eau de Toilette (Edt)</option>
+                                <option value="Eau de Parfum">Eau de Parfum (Edp)</option>
+                                <option value="Parfum">Parfum</option>
+                                <option value="Elixir">Elixir</option>
+                            </select>
                             <span v-if="errors.concentracion" class="text-xs text-red-400 block">{{ errors.concentracion }}</span>
                         </div>
                     </div>
@@ -189,16 +195,7 @@
                             <span v-else>Proponer Fragancia</span>
                         </button>
                         
-                         <transition name="fade">
-                            <div v-if="successMessage" class="mt-4 p-4 rounded-lg text-center text-sm font-medium border bg-green-500/10 border-green-500/30 text-green-400">
-                                {{ successMessage }}
-                            </div>
-                        </transition>
-                        <transition name="fade">
-                             <div v-if="submitError" class="mt-4 p-4 rounded-lg text-center text-sm font-medium border bg-red-500/10 border-red-500/30 text-red-400">
-                                {{ submitError }}
-                            </div>
-                        </transition>
+
                     </div>
 
                  </form>
@@ -216,21 +213,23 @@ import { proposePerfume } from '../services/productService'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
+import { useToastStore } from '@/stores/toastStore'
 
 const previewImage = ref('')
 const newNote = ref('')
-const successMessage = ref('')
-const submitError = ref('')
+const toastStore = useToastStore()
 
 const validationSchema = toTypedSchema(
   z.object({
     nombre: z.string().min(1, 'Este campo es obligatorio').min(2, 'El nombre debe tener al menos 2 caracteres'),
     marca: z.string().min(1, 'Este campo es obligatorio').min(2, 'La marca debe tener al menos 2 caracteres'),
-    gender: z.enum(['hombre', 'mujer', 'unisex'], { errorMap: () => ({ message: 'Selecciona una opción válida' }) }),
+    gender: z.enum(['hombre', 'mujer', 'unisex'], { 
+        errorMap: () => ({ message: 'Este campo es obligatorio' }) 
+    }),
     tipo: z.string().min(1, 'Selecciona una opción válida'),
     description: z.string().min(1, 'Este campo es obligatorio').min(10, 'La descripción debe ser más detallada'),
-    ml: z.number({ invalid_type_error: 'Debes ingresar una cantidad válida' }).min(1, 'La cantidad en ml debe ser válida'),
-    concentracion: z.string().min(1, 'Este campo es obligatorio').min(2, 'Especifica la concentración'),
+    ml: z.union([z.string(), z.number()]).transform((val) => Number(val)).refine((val) => [25, 50, 100, 200].includes(val), { message: 'Selecciona una cantidad válida' }),
+    concentracion: z.string().min(1, 'Este campo es obligatorio'),
     notas: z.array(z.string()).min(1, 'Agrega al menos una nota olfativa'),
     imagen: z.any().optional()
   })
@@ -285,12 +284,13 @@ const handleFileUpload = (event) => {
 }
 
 const submitProposal = handleSubmit(async (values) => {
-    successMessage.value = ''
-    submitError.value = ''
-    
     try {
         await proposePerfume(values)
-        successMessage.value = '¡Propuesta enviada con éxito! Gracias por tu contribución.'
+        toastStore.addToast({
+            message: '¡Propuesta enviada con éxito! Gracias por tu contribución.',
+            type: 'success',
+            duration: 5000
+        })
         
         // Reset form
         resetForm()
@@ -298,9 +298,17 @@ const submitProposal = handleSubmit(async (values) => {
         
     } catch (error) {
         if (error.status === 401) {
-            submitError.value = 'No estás autorizado. Por favor, inicia sesión para proponer un perfume.'
+            toastStore.addToast({
+                message: 'No estás autorizado. Por favor, inicia sesión para proponer un perfume.',
+                type: 'error',
+                duration: 5000
+            })
         } else {
-            submitError.value = 'Hubo un error al enviar la propuesta. Inténtalo de nuevo.'
+            toastStore.addToast({
+                message: 'Hubo un error al enviar la propuesta. Inténtalo de nuevo.',
+                type: 'error',
+                duration: 5000
+            })
         }
     }
 })

@@ -123,6 +123,8 @@ export const getProductById = async (id) => {
 
 export const proposePerfume = async (data) => {
     try {
+        const token = localStorage.getItem('auth_token')
+
         const formData = new FormData()
 
         for (const key in data) {
@@ -135,6 +137,9 @@ export const proposePerfume = async (data) => {
 
         const response = await fetch(`${API_URL}/perfumes/propose`, {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             body: formData
             // Content-Type header is automatically set by browser for FormData
         })

@@ -1,12 +1,12 @@
 <template>
       
 
-  <section class="relative container rounded-xl my-5 mx-auto px-4 min-h-[700px]  w-full flex items-center overflow-hidden ">
+  <section class="relative min-h-[700px] w-full flex items-center overflow-hidden">
 
     
   
     <!-- Background Elements -->
-       <img src="../../assets/img/bg-1.webp" alt="Background Image" class="container mx-auto absolute inset-0 w-full h-full object-cover">
+       <img src="../../assets/img/bg-1.webp" alt="Background Image" class="absolute inset-0 w-full h-full object-cover">
       <div class="absolute inset-0">
           <div class="absolute inset-0 bg-[url('../../assets/img/bg-ps3.png')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
           <!-- Radial Gold light effect -->
@@ -14,7 +14,7 @@
           <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-deep-midnight via-deep-midnight/80 to-transparent"></div>
       </div>
 
-      <div class="container mx-auto px-4 relative z-10 grid md:grid-cols-2 gap-8 items-center">
+      <div class="container mx-auto  relative z-10 grid md:grid-cols-2 gap-8 items-center">
           <!-- Text Content -->
           <div class="space-y-8 animate-fade-in-up py-12 md:py-0">
               <div class="flex items-center gap-3">

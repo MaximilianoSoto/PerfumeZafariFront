@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import AppLoader from './components/ui/AppLoader.vue'
 import AppHeader from './components/layouts/AppHeader.vue'
+import ToastNotification from './components/common/ToastNotification.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -24,6 +25,7 @@ router.afterEach(() => {
 <template>
   <AppHeader v-if="showHeader" />
   <AppLoader :loading="isLoading" />
+  <ToastNotification />
   <RouterView />
 
   
