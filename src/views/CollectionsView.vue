@@ -2,9 +2,9 @@
   <div class="min-h-screen bg-deep-midnight text-white font-montserrat flex flex-col">
 
     
-    <div class="pt-20 pb-10 text-center">
-        <h1 class="text-4xl text-luxury-gold font-bold uppercase tracking-widest">Nuestra Colección</h1>
-        <p class="text-gray-400 mt-4">Explore our exclusive range of fragrances.</p>
+    <div class="pt-16 pb-8 text-center px-4">
+        <h1 class="text-2xl sm:text-4xl text-luxury-gold font-bold uppercase tracking-widest">Nuestra Colección</h1>
+        <p class="text-gray-400 mt-3 text-sm sm:text-base">Explora nuestra selección exclusiva de fragancias.</p>
     </div>
 
     <ProductGrid title="All Perfumes" :products="products" @loadMore="loadProducts" />

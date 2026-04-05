@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authService } from '@/services/authService'
+import { useWishlistStore } from '@/stores/wishlistStore'
 
 export const useAuthStore = defineStore('auth', () => {
     // State
@@ -46,6 +47,9 @@ export const useAuthStore = defineStore('auth', () => {
             user.value = null
             token.value = null
             authService.clearSession()
+            // Limpiar wishlist al cerrar sesión
+            const wishlistStore = useWishlistStore()
+            wishlistStore.reset()
             isLoading.value = false
         }
     }

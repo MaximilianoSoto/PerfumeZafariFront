@@ -41,18 +41,20 @@
       </div>
 
       <!-- Popular Tags -->
-      <div class="flex flex-wrap gap-2 mb-10 overflow-x-auto pb-2 scrollbar-hide">
+      <div class="overflow-x-auto pb-2 mb-6 -mx-4 px-4 scrollbar-hide">
+        <div class="flex gap-2 w-max sm:w-auto sm:flex-wrap">
           <button 
             v-for="tagObj in popularTags.data" 
             :key="tagObj.tag"
             @click="selectTag(tagObj.tag)"
-            class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap"
+            class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0"
             :class="searchQuery === tagObj.tag 
               ? 'bg-luxury-gold text-black shadow-[0_0_5px_2px_rgba(212,175,55,0.4)] font-bold' 
               : 'bg-[#1A1B24] text-gray-400 hover:text-white hover:bg-[#252630]'"
           >
            #{{ tagObj.tag }}
           </button>
+        </div>
       </div>
 
      

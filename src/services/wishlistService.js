@@ -1,5 +1,8 @@
-const API_URL = import.meta.env.VITE_API_URL || 'https://api.perfumezafari.cl'
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.perfumezafari.cl/api'
 
+/**
+ * Helper: returns Authorization headers with Bearer token from localStorage
+ */
 function getAuthHeaders() {
     const token = localStorage.getItem('auth_token')
     return {
@@ -8,9 +11,24 @@ function getAuthHeaders() {
     }
 }
 
+/**
+ * Servicio de lista de deseos (Wishlist / Favoritos)
+ *
+ * Schema POST/PUT:
+ * {
+ *   perfumeId: string (uuid)   -- requerido
+ *   priority:  integer 1-3     -- 1=baja, 2=media, 3=alta (default: 1)
+ *   nota:      string ≤255     -- opcional
+ * }
+ */
 export const wishlistService = {
+
+    // ────────────────────────────────────────────
+    // 1. GET /api/wishlist
+    // ────────────────────────────────────────────
     /**
-     * Get all wishlist items
+     * Obtener todos los ítems de la wishlist del usuario autenticado.
+     * @returns {Promise<Object>} Respuesta completa de la API
      */
     async getWishlist() {
         const response = await fetch(`${API_URL}/wishlist`, {
@@ -26,51 +44,66 @@ export const wishlistService = {
         return response.json()
     },
 
+    // ────────────────────────────────────────────
+    // 2. POST /api/wishlist
+    // ────────────────────────────────────────────
     /**
-     * Add perfume to wishlist
-     * @param {number} perfumeId - ID of the perfume
-     * @param {number} priority - Priority level (1-5)
-     * @param {string} nota - Optional note
+     * Agregar un perfume a la wishlist.
+     * @param {string}  perfumeId  UUID del perfume (requerido)
+     * @param {number}  priority   1=baja | 2=media | 3=alta (default: 1)
+     * @param {string}  nota       Nota personal (máx. 255 caracteres)
+     * @returns {Promise<Object>}
      */
-    async addToWishlist(perfumeId, priority = 3, nota = '') {
+    async addToWishlist(perfumeId, priority = 1, nota = '') {
+        const body = { perfumeId }
 
+        if (priority !== undefined && priority !== null) {
+            body.priority = Math.min(3, Math.max(1, Number(priority)))
+        }
+
+        if (nota) {
+            body.nota = String(nota).slice(0, 255)
+        }
 
         const response = await fetch(`${API_URL}/wishlist`, {
             method: 'POST',
             headers: getAuthHeaders(),
-            body: JSON.stringify({
-                perfumeId,
-                priority,
-                nota
-            })
+            body: JSON.stringify(body)
         })
-
-
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({}))
             throw new Error(error.message || 'Error al agregar a favoritos')
         }
 
-
-
         return response.json()
     },
 
+    // ────────────────────────────────────────────
+    // 3. PUT /api/wishlist/{id}
+    // ────────────────────────────────────────────
     /**
-     * Update wishlist item
-     * @param {number} id - Wishlist item ID
-     * @param {number} priority - Priority level
-     * @param {string} nota - Note
+     * Actualizar un ítem de la wishlist.
+     * @param {number|string} id       ID del ítem en la wishlist
+     * @param {number}        priority 1=baja | 2=media | 3=alta
+     * @param {string}        nota     Nota personal (máx. 255 caracteres)
+     * @returns {Promise<Object>}
      */
     async updateWishlistItem(id, priority, nota) {
+        const body = {}
+
+        if (priority !== undefined && priority !== null) {
+            body.priority = Math.min(3, Math.max(1, Number(priority)))
+        }
+
+        if (nota !== undefined && nota !== null) {
+            body.nota = String(nota).slice(0, 255)
+        }
+
         const response = await fetch(`${API_URL}/wishlist/${id}`, {
             method: 'PUT',
             headers: getAuthHeaders(),
-            body: JSON.stringify({
-                priority,
-                nota
-            })
+            body: JSON.stringify(body)
         })
 
         if (!response.ok) {
@@ -81,9 +114,13 @@ export const wishlistService = {
         return response.json()
     },
 
+    // ────────────────────────────────────────────
+    // 4. DELETE /api/wishlist/{id}
+    // ────────────────────────────────────────────
     /**
-     * Remove item from wishlist
-     * @param {number} id - Wishlist item ID
+     * Eliminar un ítem de la wishlist.
+     * @param {number|string} id  ID del ítem en la wishlist
+     * @returns {Promise<Object>}
      */
     async removeFromWishlist(id) {
         const response = await fetch(`${API_URL}/wishlist/${id}`, {
@@ -97,5 +134,29 @@ export const wishlistService = {
         }
 
         return response.json()
+    },
+
+    // ────────────────────────────────────────────
+    // 5. GET /api/wishlist/check/{perfumeId}
+    // ────────────────────────────────────────────
+    /**
+     * Verificar si un perfume está en la wishlist del usuario.
+     * @param {string} perfumeId  UUID del perfume
+     * @returns {Promise<{ inWishlist: boolean, item: Object|null }>}
+     */
+    async checkIfInWishlist(perfumeId) {
+        const response = await fetch(`${API_URL}/wishlist/check/${perfumeId}`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        })
+
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}))
+            throw new Error(error.message || 'Error al verificar favorito')
+        }
+
+        return response.json()
     }
 }
+
+export default wishlistService

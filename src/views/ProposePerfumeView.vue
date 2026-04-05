@@ -8,13 +8,13 @@
         <div class="bg-[#1A1B24]/80 backdrop-blur-md rounded-xl border border-white/5 shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
             
             <!-- Left Panel: Image Wrapper & Preview -->
-            <div class="w-full md:w-2/5 relative bg-black/40 flex flex-col items-center justify-center p-8 border-b md:border-b-0 md:border-r border-white/5 group">
+            <div class="w-full md:w-2/5 relative bg-black/40 flex flex-col items-center justify-center p-6 md:p-8 border-b md:border-b-0 md:border-r border-white/5 group min-h-[280px] md:min-h-0">
                 <!-- Background decorative elements -->
                 <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 z-10"></div>
                 <div class="absolute top-0 left-0 w-full h-full bg-[url('../../assets/img/pattern.png')] opacity-5 mix-blend-overlay"></div>
                 
                 <!-- Main Image Preview or Placeholder -->
-                <div class="relative z-20 w-full max-w-sm aspect-[3/4] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:ring-luxury-gold/30">
+                <div class="relative z-20 w-full max-w-[200px] md:max-w-sm aspect-[3/4] rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:ring-luxury-gold/30">
                      <!-- Badge -->
                      <div class="absolute top-4 left-4 z-30 bg-luxury-gold text-deep-midnight text-xs font-bold px-3 py-1 uppercase tracking-widest shadow-lg">
                         New Arrival
@@ -49,7 +49,7 @@
             </div>
 
             <!-- Right Panel: Form -->
-            <div class="w-full md:w-3/5 p-8 md:p-12 overflow-y-auto max-h-[800px] scrollbar-thin scrollbar-thumb-luxury-gold/20 scrollbar-track-transparent">
+            <div class="w-full md:w-3/5 p-6 md:p-12">
                  <form @submit.prevent="submitProposal" class="space-y-8">
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -126,7 +126,7 @@
                     </div>
 
                      <!-- Details -->
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div class="space-y-2">
                              <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">ML</label>
                              <select
